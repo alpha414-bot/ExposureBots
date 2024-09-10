@@ -22,7 +22,7 @@ logging.basicConfig(
 logging.getLogger("httpx").setLevel(logging.WARNING)
 
 
-class Expo:
+class Video:
     def __init__(self, email, password, person) -> None:
         logging.info("```<< started class >>```")
         self.email = email
@@ -328,7 +328,7 @@ def run_in_batches(emails_and_passwords: List[Tuple[str, str, str]]):
 
 def run_single_account(email: str, password: str, person: str):
     logging.info(f"Starting process for {email}")
-    test = Expo(email=email, password=password, person=person)
+    test = Video(email=email, password=password, person=person)
     try:
         test.start()
     finally:

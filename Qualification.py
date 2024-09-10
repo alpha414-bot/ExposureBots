@@ -28,7 +28,7 @@ logging.basicConfig(
 logging.getLogger("httpx").setLevel(logging.WARNING)
 
 
-class ExposureQualification:
+class Qualification:
     def __init__(self, email: str, password: str, person: str):
         fake = Faker()
         self.first_name = fake.first_name()
@@ -661,7 +661,7 @@ def run_in_batches(emails_and_passwords: List[Tuple[str, str, str]]):
 
 def run_single_account(email: str, password: str, person: str):
     logging.info(f"Starting process for {email}")
-    test = ExposureQualification(email=email, password=password, person=person)
+    test = Qualification(email=email, password=password, person=person)
     test.setup_method()
     try:
         test.start()
