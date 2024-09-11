@@ -36,8 +36,8 @@ class Video:
     def start(self):
         try:
             self.driver.get(
-                # "https://paloaltou.co1.qualtrics.com/jfe/form/SV_3sZn2ag72SdTjE2",
-                "https://research.sc/participant/login/dynamic/42F0309D-859F-4A68-9207-5E952ADB85D8?external_id=0789abed-f21e-46d4-b4d9-45ca5389dafd&GUID=0789abed-f21e-46d4-b4d9-45ca5389dafd&Bypass=99&session=5&R1STATUS=0&R2STATUS=0&Confirm_id=58294137615"
+                "https://paloaltou.co1.qualtrics.com/jfe/form/SV_3sZn2ag72SdTjE2",
+                # "https://research.sc/participant/login/dynamic/42F0309D-859F-4A68-9207-5E952ADB85D8?external_id=0789abed-f21e-46d4-b4d9-45ca5389dafd&GUID=0789abed-f21e-46d4-b4d9-45ca5389dafd&Bypass=99&session=5&R1STATUS=0&R2STATUS=0&Confirm_id=58294137615"
             )
             self.main_section()
         except Exception as e:
@@ -82,14 +82,9 @@ class Video:
             "--user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36"
         )
         # Media Video Controller
-        if self.person.lower() == "alpha":
-            chrome_options.add_argument(
-                r"--use-file-for-fake-video-capture=C:\Users\owner\Desktop\projects\bots\Alpha_Video.y4m"
-            )
-        elif self.person.lower() == "femi":
-            chrome_options.add_argument(
-                r"--use-file-for-fake-video-capture=C:\Users\owner\Desktop\projects\bots\Femi_Video.y4m"
-            )
+        chrome_options.add_argument(
+            rf"--use-file-for-fake-video-capture=C:\Users\owner\Desktop\projects\bots\Exposure\{self.person.capitalize()}_Video.y4m"
+        )
         return chrome_options
 
     def _check_section(self, locator: str):
@@ -155,7 +150,6 @@ class Video:
 
     def index_section(self):
         try:
-            logging.info("`` touch here ``")
 
             def I_Question():
                 logging.info("<<< Question Section Thread >>>")
@@ -174,6 +168,7 @@ class Video:
                                 ("You have completed" in Text)
                                 or ("It has been less than" in Text)
                                 or ("It appears there may be an error" in Text)
+                                or ("your session has expired" in Text)
                             ):
                                 logging.info("Done ... Text")
                                 self.running = False  # stop runing the loop, video is done completely
@@ -294,7 +289,7 @@ class Video:
 
 def run_in_batches(emails_and_passwords: List[Tuple[str, str, str]]):
     total_accounts = len(emails_and_passwords)
-    max_simultaneous = 4 if total_accounts > 4 else total_accounts
+    max_simultaneous = 5 if total_accounts > 5 else total_accounts
 
     logging.info(
         f"Running for {total_accounts} accounts, max simultaneous: {max_simultaneous}"
@@ -341,25 +336,33 @@ if __name__ == "__main__":
     accounts = [
         ## Alpha
         # ...
-        # ("graychristian423@gmail.com", "247695Femi", "femi"),  # 10/09 20:22
-        # ("jewelsabby2@gmail.com", "2585abigael", "femi"),  # 10/09 18:40
-        # ("Deborahkate44@gmail.com", "2585abigael", "femi"),  # 10/09 20:23
+        # 11/09
+        # ("Deborahkate44@gmail.com", "2585abigael", "femi"), # Done
+        # ("Marykenneth795@gmail.com", "247695Femi", "Femi"),  # Done
+        # ("Judeander807@gmail.com", "247695Femi", "Femi"),  # Done
+        # ("Nicholasjude45@gmail.com", "247695Femi", "Femi"),  # Done
+        # ("Graceethan733@gmail.com", "247695Femi", "Femi"),  # Done
+        ("Martinsmalik23@gmail.com", "247695Femi", "Femi"),  # .
         # ...
-        # ("my.smtp000@gmail.com", "$Ola76lekan59", "alpha"),  # 10/09 20:24
-        # ("adigunmiracle14@gmail.com", "$Ola76lekan59", "alpha"),  # 10/09 21:42
-        # ("adigunmiracle41@gmail.com", "$Ola76lekan59", "alpha"),  # 10/09 21:41
+        # ("my.smtp000@gmail.com", "$Ola76lekan59", "alpha"),  # Done
+        # ("adigunmiracle14@gmail.com", "$Ola76lekan59", "alpha"),  # Done
         # ("moadigun30@student.lautech.edu.ng", "$Ola76lekan59", "alpha"), 🔥
         # ("adigungrace14@gmail.com", "$Ola76lekan59", "alpha"), 🔥
         # ("olayioyebukunmi@gmail.com", "$Ola76lekan59", "alpha"), 🔥
         # ...
-        # ("lucasria.code@gmail.com", "$Ola76lekan59", "alpha"), # 10/09 15:46
-        # ("olayioyetifebright@gmail.com", "$Ola76lekan59", "alpha"), # 10/09 15:37
-        # ("undertestmiracle14@gmail.com", "$Ola76lekan59", "alpha"),  # 10/09 21:29
-        ("noreplyhealthcarology@gmail.com", "$Ola76lekan59", "alpha"),  #
-        # ("anabellac671@gmail.com", "$Ola76lekan59", "alpha"),  # 10/09 21:45
-        # ("emmanueldav606@gmail.com", "$Pamilerin2006", "alpha"),
-        # ("dev.butterfly202@gmail.com", "$Ola76lekan59", "alpha"),  # 10/09 22:31
+        # ("lucasria.code@gmail.com", "$Ola76lekan59", "alpha"),  # Done
+        # ("olayioyetifebright@gmail.com", "$Ola76lekan59", "alpha"),  # Done
+        # ("undertestmiracle14@gmail.com", "$Ola76lekan59", "alpha"),  # Done
+        # ("noreplyhealthcarology@gmail.com", "$Ola76lekan59", "alpha"),  # Done
+        ("ajokemotunrayo831@gmail.com", "$Ola76lekan59", "alpha"),  # .
+        ("anabellac671@gmail.com", "$Ola76lekan59", "alpha"),  # 10/09 21:45
+        ("dev.butterfly202@gmail.com", "$Ola76lekan59", "alpha"),  # 10/09 22:31
         #
+        #
+        # post intervention session
+        # ("adigunmiracle41@gmail.com", "$Ola76lekan59", "alpha"),  # 12/09
+        # ("graychristian423@gmail.com", "247695Femi", "femi"),  # 14/09
+        # ("jewelsabby2@gmail.com", "2585abigael", "femi"),  # 14/09
         # Post intervention done (wait list for 1 months)
         # ("alphasoft2021@gmail.com", "$Ola76lekan59", "alpha"), # 09/10
         # ("micheallukas08@gmail.com", "247695Femi", "femi"), # 09/10

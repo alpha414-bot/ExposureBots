@@ -1,5 +1,5 @@
 from selenium import webdriver
-from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.chrome.service import Service as ChromeService
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
@@ -19,6 +19,12 @@ from typing import List, Tuple
 from concurrent.futures import ThreadPoolExecutor, as_completed
 import os
 import threading
+from webdriver_manager.chrome import ChromeDriverManager
+from webdriver_manager.core.file_manager import FileManager
+from webdriver_manager.core.driver_cache import DriverCacheManager
+from webdriver_manager.core.os_manager import OperationSystemManager
+from webdriver_manager.chrome import ChromeDriverManager
+
 
 logging.basicConfig(
     # filename="logs/main.log",
@@ -54,16 +60,16 @@ class Qualification:
         chrome_options.add_argument("--start-maximized")
         user_data_dir = r"C:\Users\owner\AppData\Local\Google\Chrome\User Data"
         # chrome_options.add_argument(f"--user-data-dir={user_data_dir}")
-        # chrome_options.add_argument(r"--profile-directory='Default'")
+        # chrome_options.add_argument(r"--profile-directory='Profile 2'")
         chrome_options.add_argument("--use-fake-device-for-media-stream")
         chrome_options.add_argument("--auto-accept-camera-and-microphone-capture")
         chrome_options.add_argument("--disable-infobars")
         chrome_options.add_argument("--no-sandbox")
         chrome_options.add_argument("--disable-dev-shm-usage")
         chrome_options.add_argument("--disable-gpu")
-        chrome_options.add_argument("--incognito")
+        # chrome_options.add_argument("--incognito")
         chrome_options.add_argument("--disable-extensions")
-        chrome_options.add_argument("--headless")
+        # chrome_options.add_argument("--headless=new")
         chrome_options.add_argument("--disable-blink-features=AutomationControlled")
 
         # protect from bot discovery
@@ -72,19 +78,31 @@ class Qualification:
         )
         # Disable WebDriver property
         chrome_options.add_argument("--disable-blink-features=AutomationControlled")
-        if self.person.lower() == "alpha":
-            chrome_options.add_argument(
-                r"--use-file-for-fake-video-capture=C:\Users\owner\Desktop\projects\bots\Alpha_Video.y4m"
-            )
-        elif self.person.lower() == "femi":
-            chrome_options.add_argument(
-                r"--use-file-for-fake-video-capture=C:\Users\owner\Desktop\projects\bots\Femi_Video.y4m"
-            )
+        chrome_options.add_argument(
+            rf"--use-file-for-fake-video-capture=C:\Users\owner\Desktop\projects\bots\Exposure\{self.person.capitalize()}_Video.y4m"
+        )
         chrome_options.add_argument(
             r"--use-file-for-fake-audio-capture=C:\Users\owner\Desktop\projects\bots\audio.wav"
         )
-        self.driver = webdriver.Chrome(options=chrome_options)
-        self.wait = WebDriverWait(self.driver, timeout=15)
+        # Preventing error
+        chrome_options.add_argument("--use-gl=swiftshader")
+        chrome_options.add_argument("--disable-vulkan")
+
+        ###
+        chrome_service = ChromeService(
+            r"C:\drivers\chromedriver\chromedriver.exe"
+        )  # Provide the path to chromedriver
+        cache_manager = DriverCacheManager(
+            file_manager=FileManager(os_system_manager=OperationSystemManager())
+        )
+        manager = ChromeDriverManager(cache_manager=cache_manager)
+        os_manager = OperationSystemManager(os_type="win64")
+        # self.driver = webdriver.Chrome(
+        #     service=ChromeService(ChromeDriverManager().install()),
+        #     options=chrome_options,
+        # )
+        self.driver = webdriver.Chrome(service=chrome_service, options=chrome_options)
+        self.wait = WebDriverWait(self.driver, timeout=0.4)
         self.running = True
         self.age = random.choice(range(22, 26))
         self.vars = {}
@@ -93,7 +111,7 @@ class Qualification:
         """Teardown method to quit the WebDriver and show a message box."""
         logging.info(f"Finished process for {self.email}")
         logging.warning("Driver is quitting")
-        self.driver.quit()
+        # self.driver.quit()
         os.system(
             'powershell -command "Add-Type -AssemblyName System.Windows.Forms; '
             f"[System.Windows.Forms.MessageBox]::Show('Your research for [{self.email}] is done.')\""
@@ -165,31 +183,33 @@ class Qualification:
             return "02/13/2000"
 
     def _enter_text(self, locator: str, value: str | int, clickable: bool = False):
-        match = re.search(r"QID\d+", locator)
-        if match:
-            parent_locator = match.group()  # type: ignore
-            parent_locator = self.wait.until(
-                EC.presence_of_element_located((By.CSS_SELECTOR, f".{parent_locator}"))
-            )
-            element = self.wait.until(
-                EC.presence_of_element_located((By.CSS_SELECTOR, locator))
-            )
-            self.driver.execute_script("arguments[0].scrollIntoView(true);", element)
-            element.send_keys(value)  # type: ignore
-            if clickable:
-                self._click_button()
-            logging.info(f"<< {locator} new value [{value}] is entered >>> ")
-            return True
-        else:
-            print("Unable to extract parent name!!!")
+        try:
+            match = re.search(r"QID\d+", locator)
+            if match:
+                parent_locator = match.group()  # type: ignore
+                parent_locator = self.wait.until(
+                    EC.presence_of_element_located(
+                        (By.CSS_SELECTOR, f".{parent_locator}")
+                    )
+                )
+                element = self.wait.until(
+                    EC.presence_of_element_located((By.CSS_SELECTOR, locator))
+                )
+                self.driver.execute_script(
+                    "arguments[0].scrollIntoView(true);", element
+                )
+                element.send_keys(value)  # type: ignore
+                if clickable:
+                    self._click_button()
+                logging.info(f"<< {locator} new value [{value}] is entered >>> ")
+                return True
+            else:
+                logging.warning("!!! Unable to extract parent name !!!")
+        except:
+            return False
 
     def _click_label(self, locator: str, clickable: bool = False):
-        match = re.search(r"QID\d+", locator)
-        if match:
-            parent_locator = match.group()  # type: ignore
-            parent_locator = self.wait.until(
-                EC.presence_of_element_located((By.CSS_SELECTOR, f".{parent_locator}"))
-            )
+        try:
             element = self.wait.until(
                 EC.presence_of_element_located((By.CSS_SELECTOR, locator))
             )
@@ -198,8 +218,8 @@ class Qualification:
             if clickable:
                 self._click_button()
             return True
-        else:
-            print("Unable to extract parent name!!!")
+        except:
+            return False
 
     def _click_button(self, locator: Tuple[str, str] = (By.ID, "NextButton")):
         """Clicks a button located by the specified locator."""
@@ -212,10 +232,11 @@ class Qualification:
         except:
             return False
 
-    def _check_section(self, locator: str):
+    def _check_section(self, locator: str, timeout: float = 0.2):
         """Checks if a section is present by the specified locator."""
         try:
-            return self.wait.until(
+            custom_wait = WebDriverWait(self.driver, timeout=timeout)
+            return custom_wait.until(
                 EC.presence_of_element_located((By.CSS_SELECTOR, locator))
             )
         except:
@@ -233,6 +254,9 @@ class Qualification:
 
     def main_section(self):
         try:
+            self.driver.execute_script(
+                f"document.title = '[{self.email}] Qualification Exposure';"
+            )
             # agree to volunter
             self._click_label("label[for='QR~QID650~1']#QID650-1-label", True)
             # To complete the computerized task you MUST be on a computer with a webcamera and audio recording capability. (YES)
@@ -404,7 +428,7 @@ class Qualification:
                         if self._visible_section("#Questions"):
                             Text = self.driver.find_element(By.ID, "Questions").text
                             if "You can download the handout" in Text:
-                                if self._check_section("#NextButton"):
+                                if self._check_section("#NextButton", timeout=1):
                                     self._click_button()
                             # Add a condition to break out of the loop when the task is done
                             if "You have completed" in Text:
@@ -420,7 +444,7 @@ class Qualification:
                 while self.running:
                     try:
                         if self._visible_section("#gorilla", timeout=0.2):
-                            CustomWebWait = WebDriverWait(self.driver, timeout=4)
+                            CustomWebWait = WebDriverWait(self.driver, timeout=0.2)
                             parent_elements = CustomWebWait.until(
                                 EC.visibility_of_any_elements_located(
                                     (By.CSS_SELECTOR, "#gorilla div.lookahead-frame")
@@ -495,6 +519,21 @@ class Qualification:
                     except:
                         continue
 
+            def I_InstructionVideo():
+                logging.info(
+                    "<<< skipping instruction video and clicking on the title to skip"
+                )
+                while self.running:
+                    try:
+                        if self._visible_section(
+                            "h1.gorilla-inject.undraggable", timeout=1
+                        ):
+                            self._click_button(
+                                (By.CSS_SELECTOR, "h1.gorilla-inject.undraggable")
+                            )
+                    except:
+                        continue
+
             def I_ClickLabel(label_locator, clickable_button: bool = False):
                 logging.info("<<< Clicking label >>>")
                 while self.running:
@@ -513,9 +552,19 @@ class Qualification:
                         if self._visible_section(
                             f"input[name='{input_locator}']", timeout=0.2
                         ):
-                            self._enter_text(f"input[name='{input_locator}']", value)
-                            if clickable_button:
-                                self._click_button()
+                            InitialValue = self.driver.find_element(
+                                "input[name='{input_locator}']"
+                            ).get_attribute("value")
+                            print("initial value", value)
+                            if not InitialValue:
+                                self._enter_text(
+                                    f"input[name='{input_locator}']",
+                                    value,
+                                    clickable_button,
+                                )
+                            else:
+                                if clickable_button:
+                                    self._click_button()
                     except:
                         continue
 
@@ -525,6 +574,7 @@ class Qualification:
             NextButtonThread = threading.Thread(
                 target=I_ButtonSetup, args=("NextButton",)
             )
+            I_InstructionVideoThread = threading.Thread(target=I_InstructionVideo)
             ContinueButtonThread = threading.Thread(
                 target=I_ButtonSetup, args=("continue-button",)
             )
@@ -537,7 +587,7 @@ class Qualification:
             # 116, Review before continuing
             # label[for='QR~QID650~1']#QID650-1-label
             ReviewLabelThread = threading.Thread(
-                target=I_ClickLabel, args=("QR~QID116~1",)
+                target=I_ClickLabel, args=("label[for='QR~QID650~1']#QID650-1-label",)
             )
             # 117, Email Address
             EmailThread = threading.Thread(
@@ -570,7 +620,7 @@ class Qualification:
             RetainEmailThread = threading.Thread(
                 target=I_ClickLabel,
                 args=(
-                    "QR~QID748~1",
+                    "label[for='QR~QID748~1']#QID748-1-label",
                     True,
                 ),
             )
@@ -591,6 +641,7 @@ class Qualification:
             I_QuestionThread.start()
             I_GorillaThread.start()
             I_SliderRangeThread.start()
+            I_InstructionVideoThread.start()
             ReviewLabelThread.start()
             EmailThread.start()
             LegalNameThread.start()
@@ -607,6 +658,7 @@ class Qualification:
             I_QuestionThread.join()
             I_GorillaThread.join()
             I_SliderRangeThread.join()
+            I_InstructionVideoThread.join()
             ReviewLabelThread.join()
             EmailThread.join()
             LegalNameThread.join()
@@ -674,31 +726,25 @@ def run_single_account(email: str, password: str, person: str):
 if __name__ == "__main__":
     accounts = [
         ## Alpha
-        ("ajokemotunrayo831@gmail.com", "$Ola76lekan59", "alpha"),
         # ("moadigun30@student.lautech.edu.ng", "$Ola76lekan59", "alpha"), 🔥
         # ("olayioyebukunmi@gmail.com", "$Ola76lekan59", "alpha"), 🔥\
         ## Femi
         # ("Oluwafemidesmond6@gmail.com", "247695Femi", "Femi"),
-        # ("Marykenneth795@gmail.com", "247695Femi", "Femi"),
-        # ("Graceethan733@gmail.com", "247695Femi", "Femi"),
         # ("Kelvinsimon891@gmail.com", "247695Femi", "Femi"),
-        # ("Nicholasjude45@gmail.com", "247695Femi", "Femi"),
         # ("Johnphilip0989@gmail.com", "247695Femi", "Femi"),
-        # ("Martinsmalik23@gmail.com", "247695Femi", "Femi"),
-        # ("Judeander807@gmail.com", "247695Femi", "Femi"),
         # ("Rosegeorge3j@gmail.com", "247695Femi", "Femi"),
-        # ("Jameswattsons08@gmail.com", "247695Femi", "Femi"),
+        ("Jameswattsons08@gmail.com", "247695Femi", "Femi"),
         # ("Charlesharris1597@gmail.com", "247695Femi", "Femi"),
         # ("Robynbell622@gmail.com", "247695Femi", "Femi"),
         # ("Edwardmorris353@gmail.com", "247695Femi", "Femi"),
         # ("Russellhenry209@gmail.com", "247695Femi", "Femi"),
         # ("Adelathornton321@gmail.com", "247695Femi", "Femi"),
-        # ("janelizabeth789@gmail.com", "$Pamilerin2006", "alpha"),
+        ("janelizabeth789@gmail.com", "$Pamilerin2006", "alpha"),
         # ("irisroseline10@gmail.com", "$Pamilerin2006", "alpha"),
-        # ("richardmiky009@gmail.com", "$Pamilerin2006", "alpha"),
-        # ("Andrewmikelee200@gmail.com", "$Pamilerin2006", "alpha"),
+        ("richardmiky009@gmail.com", "$Pamilerin2006", "alpha"),
+        ("Andrewmikelee200@gmail.com", "$Pamilerin2006", "alpha"),
         # ("olashileayomide126@gmail.com", "$Ola76lekan59", "alpha"),
-        # ("alphaadigunayomide@gmail.com", "$Ola76lekan59", "alpha"),
+        ("alphaadigunayomide@gmail.com", "$Ola76lekan59", "alpha"),
         # Add more accounts as needed
     ]
     run_in_batches(accounts)
