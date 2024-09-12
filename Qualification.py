@@ -47,66 +47,6 @@ class Qualification:
             ["New York", "California", "Texas", "illinois", "Washington"]
         )
 
-    def setup_method(self):
-        chrome_options = Options()
-        prefs = {
-            "profile.default_content_setting_values.media_stream_mic": 1,
-            "profile.default_content_setting_values.media_stream_camera": 1,
-            "profile.default_content_setting_values.geolocation": 1,
-            "profile.default_content_setting_values.notifications": 1,
-        }
-        chrome_options.add_experimental_option("prefs", prefs)
-        chrome_options.add_experimental_option("detach", True)
-        chrome_options.add_argument("--start-maximized")
-        user_data_dir = r"C:\Users\owner\AppData\Local\Google\Chrome\User Data"
-        # chrome_options.add_argument(f"--user-data-dir={user_data_dir}")
-        # chrome_options.add_argument(r"--profile-directory='Profile 2'")
-        chrome_options.add_argument("--use-fake-device-for-media-stream")
-        chrome_options.add_argument("--auto-accept-camera-and-microphone-capture")
-        chrome_options.add_argument("--disable-infobars")
-        chrome_options.add_argument("--no-sandbox")
-        chrome_options.add_argument("--disable-dev-shm-usage")
-        chrome_options.add_argument("--disable-gpu")
-        # chrome_options.add_argument("--incognito")
-        chrome_options.add_argument("--disable-extensions")
-        # chrome_options.add_argument("--headless=new")
-        chrome_options.add_argument("--disable-blink-features=AutomationControlled")
-
-        # protect from bot discovery
-        chrome_options.add_argument(
-            "--user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36"
-        )
-        # Disable WebDriver property
-        chrome_options.add_argument("--disable-blink-features=AutomationControlled")
-        chrome_options.add_argument(
-            rf"--use-file-for-fake-video-capture=C:\Users\owner\Desktop\projects\bots\Exposure\{self.person.capitalize()}_Video.y4m"
-        )
-        chrome_options.add_argument(
-            r"--use-file-for-fake-audio-capture=C:\Users\owner\Desktop\projects\bots\audio.wav"
-        )
-        # Preventing error
-        chrome_options.add_argument("--use-gl=swiftshader")
-        chrome_options.add_argument("--disable-vulkan")
-
-        ###
-        chrome_service = ChromeService(
-            r"C:\drivers\chromedriver\chromedriver.exe"
-        )  # Provide the path to chromedriver
-        cache_manager = DriverCacheManager(
-            file_manager=FileManager(os_system_manager=OperationSystemManager())
-        )
-        manager = ChromeDriverManager(cache_manager=cache_manager)
-        os_manager = OperationSystemManager(os_type="win64")
-        # self.driver = webdriver.Chrome(
-        #     service=ChromeService(ChromeDriverManager().install()),
-        #     options=chrome_options,
-        # )
-        self.driver = webdriver.Chrome(service=chrome_service, options=chrome_options)
-        self.wait = WebDriverWait(self.driver, timeout=0.4)
-        self.running = True
-        self.age = random.choice(range(22, 26))
-        self.vars = {}
-
     def teardown_method(self):
         """Teardown method to quit the WebDriver and show a message box."""
         logging.info(f"Finished process for {self.email}")
@@ -117,12 +57,8 @@ class Qualification:
             f"[System.Windows.Forms.MessageBox]::Show('Your research for [{self.email}] is done.')\""
         )
 
-    def start(self):
-        self.driver.get(
-            "https://paloaltou.co1.qualtrics.com/jfe/form/SV_3sZn2ag72SdTjE2?Bypass=2&Gorilla=0"
-        )
-        logging.info(f"<<< External UID and GUID is {self.uuid} >>>")
-        self.driver.execute_script(
+    def embbed_uid(self):
+        return self.driver.execute_script(
             f"""
                     var d = new Date();
                     var fu1date = new Date(d.getTime() + 7 * 86400000);
@@ -145,11 +81,82 @@ class Qualification:
                     Qualtrics.SurveyEngine.setEmbeddedData("FU1DATE", fu1date);
         """,
         )
-        self.wait.until(
-            lambda driver: driver.execute_script(
-                "return Qualtrics.SurveyEngine.getEmbeddedData('GUID') !== null"
-            )
+
+    def setup_method(self):
+        chrome_options = Options()
+        prefs = {
+            "profile.default_content_setting_values.media_stream_mic": 1,
+            "profile.default_content_setting_values.media_stream_camera": 1,
+            "profile.default_content_setting_values.geolocation": 1,
+            "profile.default_content_setting_values.notifications": 1,
+        }
+        chrome_options.add_experimental_option("prefs", prefs)
+        chrome_options.add_experimental_option("detach", True)
+        chrome_options.add_argument("--start-maximized")
+        user_data_dir = r"C:\Users\owner\AppData\Local\Google\Chrome\User Data"
+        # chrome_options.add_argument(f"--user-data-dir={user_data_dir}")
+        # chrome_options.add_argument(r"--profile-directory='Profile 2'")
+        chrome_options.add_argument("--use-fake-device-for-media-stream")
+        chrome_options.add_argument("--auto-accept-camera-and-microphone-capture")
+        chrome_options.add_argument("--disable-infobars")
+        chrome_options.add_argument(
+            "--no-sandbox"
+        )  # Sandbox issues sometimes cause crashes
+        chrome_options.add_argument("--disable-dev-shm-usage")
+        # gpu acceleration related
+        chrome_options.add_argument("--disable-gpu")  # Disable GPU rendering
+        chrome_options.add_argument(
+            "--disable-software-rasterizer"
+        )  # Disable SwiftShader fallback
+        chrome_options.add_argument("--disable-gpu-process-early-init")
+        chrome_options.add_argument("--disable-gpu-watchdog")
+        chrome_options.add_argument("--disable-gpu-process-crash-limit")
+        # chrome_options.add_argument("--incognito")
+        # chrome_options.add_argument("--disable-extensions")
+        # chrome_options.add_argument("--headless")  # Optional: run in headless mode
+        chrome_options.add_argument("--disable-blink-features=AutomationControlled")
+
+        # protect from bot discovery
+        chrome_options.add_argument(
+            "--user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36"
         )
+        # Disable WebDriver property
+        chrome_options.add_argument("--disable-blink-features=AutomationControlled")
+        chrome_options.add_argument(
+            rf"--use-file-for-fake-video-capture=C:\Users\owner\Desktop\projects\bots\Exposure\{self.person.capitalize()}_Video.y4m"
+        )
+        chrome_options.add_argument(
+            r"--use-file-for-fake-audio-capture=C:\Users\owner\Desktop\projects\bots\audio.wav"
+        )
+        # Preventing error
+        chrome_options.add_argument("--use-gl=egl")
+        chrome_options.add_argument("--disable-vulkan")
+
+        ###
+        chrome_service = ChromeService(
+            r"C:\drivers\chromedriver\chromedriver.exe"
+        )  # Provide the path to chromedriver
+        cache_manager = DriverCacheManager(
+            file_manager=FileManager(os_system_manager=OperationSystemManager())
+        )
+        manager = ChromeDriverManager(cache_manager=cache_manager)
+        os_manager = OperationSystemManager(os_type="win64")
+        # self.driver = webdriver.Chrome(
+        #     service=ChromeService(ChromeDriverManager().install()),
+        #     options=chrome_options,
+        # )
+        self.driver = webdriver.Chrome(service=chrome_service, options=chrome_options)
+        self.wait = WebDriverWait(self.driver, timeout=10)
+        self.running = True
+        self.age = random.choice(range(22, 26))
+        self._dob()
+        self.vars = {}
+
+    def start(self):
+        self.driver.get(
+            "https://paloaltou.co1.qualtrics.com/jfe/form/SV_3sZn2ag72SdTjE2?Bypass=2&Gorilla=0"
+        )
+        logging.info(f"<<< External UID and GUID is {self.uuid} >>>")
         self.main_section()
 
     def _dob(self):
@@ -178,6 +185,7 @@ class Qualification:
 
             # Step 6: Format the date in "mm/dd/yyyy" format
             formatted_dob = random_dob.strftime("%m/%d/%Y")
+            self.date_of_birth = formatted_dob
             return formatted_dob
         except:
             return "02/13/2000"
@@ -254,8 +262,17 @@ class Qualification:
 
     def main_section(self):
         try:
+            if self.wait.until(
+                lambda driver: driver.execute_script(
+                    "return Qualtrics.SurveyEngine.getEmbeddedData('GUID') !== null"
+                )
+            ):
+                self.embbed_uid()
+            else:
+                self.embbed_uid()
+
             self.driver.execute_script(
-                f"document.title = '[{self.email}] Qualification Exposure';"
+                f"document.title = '[{self.email}] Qualification Exposure'; console.log('Personal Info', 'Name: {self.last_name} {self.first_name}')"
             )
             # agree to volunter
             self._click_label("label[for='QR~QID650~1']#QID650-1-label", True)
@@ -412,7 +429,12 @@ class Qualification:
             self._click_button()
             self.start_teleconferencing()
         except Exception as e:
-            logging.error(f"Problem with main section: {traceback.format_exc()}")
+            logging.error(
+                f"Problem with main section for <<<[[[{self.email}]]]>>>: {traceback.format_exc()}"
+            )
+        finally:
+            self._click_button()
+            self.start_teleconferencing()
 
     # teleconferencing
     def start_teleconferencing(self):
@@ -505,7 +527,18 @@ class Qualification:
                 logging.info(f"<<< running button thread: {id_locator} >>>")
                 while self.running:
                     self.driver.execute_script(
-                        f"document.title = '[{self.email}] Qualification Exposure';"
+                        f"""
+                        document.title = '[{self.email}] Qualification Exposure';
+                        console.log(JSON.stringify({{
+                            'uuid': '{self.uuid}',
+                            'first_name': '{self.first_name}', 
+                            'last_name': '{self.last_name}', 
+                            'email': '{self.email}',
+                            'city': '{self.city}',
+                            'age': '{self.age}', 
+                            'dob': '{self.date_of_birth}',
+                        }}));
+                        """
                     )
                     try:
                         if not self._visible_section(
@@ -612,7 +645,7 @@ class Qualification:
                 target=I_EnterText,
                 args=(
                     "QR~QID778~TEXT",
-                    self._dob(),
+                    self.date_of_birth,
                     True,
                 ),
             )
@@ -674,12 +707,12 @@ class Qualification:
             print(f"<< problem continue the conferencing: {traceback.format_exc()} >>>")
             self.teardown_method()
         finally:
-            print("Ending the button loop:")
+            print("<<< Ending the conferencing >>>")
 
 
 def run_in_batches(emails_and_passwords: List[Tuple[str, str, str]]):
     total_accounts = len(emails_and_passwords)
-    max_simultaneous = 4 if total_accounts > 8 else total_accounts
+    max_simultaneous = 4 if total_accounts > 4 else total_accounts
 
     logging.info(
         f"Running for {total_accounts} accounts, max simultaneous: {max_simultaneous}"
@@ -725,26 +758,6 @@ def run_single_account(email: str, password: str, person: str):
 
 if __name__ == "__main__":
     accounts = [
-        ## Alpha
-        # ("moadigun30@student.lautech.edu.ng", "$Ola76lekan59", "alpha"), 🔥
-        # ("olayioyebukunmi@gmail.com", "$Ola76lekan59", "alpha"), 🔥\
-        ## Femi
-        # ("Oluwafemidesmond6@gmail.com", "247695Femi", "Femi"),
-        # ("Kelvinsimon891@gmail.com", "247695Femi", "Femi"),
-        # ("Johnphilip0989@gmail.com", "247695Femi", "Femi"),
-        # ("Rosegeorge3j@gmail.com", "247695Femi", "Femi"),
-        ("Jameswattsons08@gmail.com", "247695Femi", "Femi"),
-        # ("Charlesharris1597@gmail.com", "247695Femi", "Femi"),
-        # ("Robynbell622@gmail.com", "247695Femi", "Femi"),
-        # ("Edwardmorris353@gmail.com", "247695Femi", "Femi"),
-        # ("Russellhenry209@gmail.com", "247695Femi", "Femi"),
-        # ("Adelathornton321@gmail.com", "247695Femi", "Femi"),
-        ("janelizabeth789@gmail.com", "$Pamilerin2006", "alpha"),
-        # ("irisroseline10@gmail.com", "$Pamilerin2006", "alpha"),
-        ("richardmiky009@gmail.com", "$Pamilerin2006", "alpha"),
-        ("Andrewmikelee200@gmail.com", "$Pamilerin2006", "alpha"),
-        # ("olashileayomide126@gmail.com", "$Ola76lekan59", "alpha"),
-        ("alphaadigunayomide@gmail.com", "$Ola76lekan59", "alpha"),
         # Add more accounts as needed
     ]
     run_in_batches(accounts)

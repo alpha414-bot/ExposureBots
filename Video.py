@@ -30,8 +30,8 @@ class Video:
         self.person = person
         self.driver = webdriver.Chrome(options=self.chrome_options())
         self.wait = WebDriverWait(self.driver, timeout=10)
-        self.vars = {}
         self.running = True
+        self.vars = {}
 
     def start(self):
         try:
@@ -342,21 +342,35 @@ if __name__ == "__main__":
         # ("Judeander807@gmail.com", "247695Femi", "Femi"),  # Done
         # ("Nicholasjude45@gmail.com", "247695Femi", "Femi"),  # Done
         # ("Graceethan733@gmail.com", "247695Femi", "Femi"),  # Done
-        ("Martinsmalik23@gmail.com", "247695Femi", "Femi"),  # .
-        # ...
+        # ("Martinsmalik23@gmail.com", "247695Femi", "Femi"),  # Done
+        ("Oluwafemidesmond6@gmail.com", "247695Femi", "Femi"),
+        ("Kelvinsimon891@gmail.com", "247695Femi", "Femi"),
+        ("Johnphilip0989@gmail.com", "247695Femi", "Femi"),
+        ("Rosegeorge3j@gmail.com", "247695Femi", "Femi"),
+        ("irisroseline10@gmail.com", "$Pamilerin2006", "alpha"),
+        ("Charlesharris1597@gmail.com", "247695Femi", "Femi"),
+        ("Jameswattsons08@gmail.com", "247695Femi", "Femi"),
+        ("janelizabeth789@gmail.com", "$Pamilerin2006", "alpha"),
+        ("richardmiky009@gmail.com", "$Pamilerin2006", "alpha"),
+        ("Robynbell622@gmail.com", "247695Femi", "Femi"),
+        ("Edwardmorris353@gmail.com", "247695Femi", "Femi"),
+        ("Andrewmikelee200@gmail.com", "$Pamilerin2006", "alpha"),
+        ("olashileayomide126@gmail.com", "$Ola76lekan59", "alpha"),
+        ("Adelathornton321@gmail.com", "247695Femi", "Femi"),
+        ("alphaadigunayomide@gmail.com", "$Ola76lekan59", "alpha"),
+        ("Russellhenry209@gmail.com", "247695Femi", "Femi"),
+        # ("moadigun30@student.lautech.edu.ng", "$Ola76lekan59", "alpha"), # 🔥
+        # ("olayioyebukunmi@gmail.com", "$Ola76lekan59", "alpha"),  # 🔥
         # ("my.smtp000@gmail.com", "$Ola76lekan59", "alpha"),  # Done
         # ("adigunmiracle14@gmail.com", "$Ola76lekan59", "alpha"),  # Done
-        # ("moadigun30@student.lautech.edu.ng", "$Ola76lekan59", "alpha"), 🔥
-        # ("adigungrace14@gmail.com", "$Ola76lekan59", "alpha"), 🔥
-        # ("olayioyebukunmi@gmail.com", "$Ola76lekan59", "alpha"), 🔥
         # ...
         # ("lucasria.code@gmail.com", "$Ola76lekan59", "alpha"),  # Done
         # ("olayioyetifebright@gmail.com", "$Ola76lekan59", "alpha"),  # Done
         # ("undertestmiracle14@gmail.com", "$Ola76lekan59", "alpha"),  # Done
         # ("noreplyhealthcarology@gmail.com", "$Ola76lekan59", "alpha"),  # Done
-        ("ajokemotunrayo831@gmail.com", "$Ola76lekan59", "alpha"),  # .
-        ("anabellac671@gmail.com", "$Ola76lekan59", "alpha"),  # 10/09 21:45
-        ("dev.butterfly202@gmail.com", "$Ola76lekan59", "alpha"),  # 10/09 22:31
+        # ("ajokemotunrayo831@gmail.com", "$Ola76lekan59", "alpha"),  # Done
+        # ("anabellac671@gmail.com", "$Ola76lekan59", "alpha"),  # Done
+        # ("dev.butterfly202@gmail.com", "$Ola76lekan59", "alpha"),  # Done
         #
         #
         # post intervention session
