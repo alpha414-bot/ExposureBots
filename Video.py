@@ -24,7 +24,6 @@ logging.getLogger("httpx").setLevel(logging.WARNING)
 
 class Video:
     def __init__(self, email, password, person) -> None:
-        logging.info("```<< started class >>```")
         self.email = email
         self.password = password
         self.person = person
@@ -243,6 +242,14 @@ class Video:
                     self.driver.execute_script(
                         f"document.title = '[{self.email}] Video Exposure ';"
                     )
+                    self.driver.execute_script(
+                        f"""
+                        document.title = '[{self.email}] Qualification Exposure';
+                        console.log(JSON.stringify({{
+                            'email': '{self.email}'
+                        }}));
+                        """
+                    )
                     try:
                         if not self._visible_section(
                             "#Questions", timeout=0.2
@@ -289,7 +296,7 @@ class Video:
 
 def run_in_batches(emails_and_passwords: List[Tuple[str, str, str]]):
     total_accounts = len(emails_and_passwords)
-    max_simultaneous = 5 if total_accounts > 5 else total_accounts
+    max_simultaneous = 5 if total_accounts >= 5 else total_accounts
 
     logging.info(
         f"Running for {total_accounts} accounts, max simultaneous: {max_simultaneous}"
@@ -337,46 +344,44 @@ if __name__ == "__main__":
         ## Alpha
         # ...
         # 11/09
-        # ("Deborahkate44@gmail.com", "2585abigael", "femi"), # Done
+        # ("anabellac671@gmail.com", "$Ola76lekan59", "alpha"),  # Done
         # ("Marykenneth795@gmail.com", "247695Femi", "Femi"),  # Done
-        # ("Judeander807@gmail.com", "247695Femi", "Femi"),  # Done
+        # ("ajokemotunrayo831@gmail.com", "$Ola76lekan59", "alpha"),  # Done
         # ("Nicholasjude45@gmail.com", "247695Femi", "Femi"),  # Done
         # ("Graceethan733@gmail.com", "247695Femi", "Femi"),  # Done
+        # ("dev.butterfly202@gmail.com", "$Ola76lekan59", "alpha"),  # Done
         # ("Martinsmalik23@gmail.com", "247695Femi", "Femi"),  # Done
-        ("Oluwafemidesmond6@gmail.com", "247695Femi", "Femi"),
-        ("Kelvinsimon891@gmail.com", "247695Femi", "Femi"),
-        ("Johnphilip0989@gmail.com", "247695Femi", "Femi"),
-        ("Rosegeorge3j@gmail.com", "247695Femi", "Femi"),
-        ("irisroseline10@gmail.com", "$Pamilerin2006", "alpha"),
-        ("Charlesharris1597@gmail.com", "247695Femi", "Femi"),
-        ("Jameswattsons08@gmail.com", "247695Femi", "Femi"),
-        ("janelizabeth789@gmail.com", "$Pamilerin2006", "alpha"),
+        # ("noreplyhealthcarology@gmail.com", "$Ola76lekan59", "alpha"),  # Done
+        # ("Oluwafemidesmond6@gmail.com", "247695Femi", "Femi"),
+        # ("lucasria.code@gmail.com", "$Ola76lekan59", "alpha"),  # Done
+        # ("Kelvinsimon891@gmail.com", "247695Femi", "Femi"), # Done
+        # ("olayioyetifebright@gmail.com", "$Ola76lekan59", "alpha"),  # Done
+        # ("Johnphilip0989@gmail.com", "247695Femi", "Femi"), # Done
+        # ("undertestmiracle14@gmail.com", "$Ola76lekan59", "alpha"),  # Done
+        # ("Rosegeorge3j@gmail.com", "247695Femi", "Femi"), # Done
+	("irisroseline10@gmail.com", "$Pamilerin2006", "alpha"),
+	# ("Charlesharris1597@gmail.com", "247695Femi", "Femi"), # Done
+        # ("janelizabeth789@gmail.com", "$Pamilerin2006", "alpha"), # Done
+	# ("Jameswattsons08@gmail.com", "247695Femi", "Femi"), # Done
         ("richardmiky009@gmail.com", "$Pamilerin2006", "alpha"),
         ("Robynbell622@gmail.com", "247695Femi", "Femi"),
+        ("olashileayomide126@gmail.com", "$Ola76lekan59", "alpha"),
         ("Edwardmorris353@gmail.com", "247695Femi", "Femi"),
         ("Andrewmikelee200@gmail.com", "$Pamilerin2006", "alpha"),
-        ("olashileayomide126@gmail.com", "$Ola76lekan59", "alpha"),
         ("Adelathornton321@gmail.com", "247695Femi", "Femi"),
         ("alphaadigunayomide@gmail.com", "$Ola76lekan59", "alpha"),
         ("Russellhenry209@gmail.com", "247695Femi", "Femi"),
-        # ("moadigun30@student.lautech.edu.ng", "$Ola76lekan59", "alpha"), # 🔥
-        # ("olayioyebukunmi@gmail.com", "$Ola76lekan59", "alpha"),  # 🔥
-        # ("my.smtp000@gmail.com", "$Ola76lekan59", "alpha"),  # Done
-        # ("adigunmiracle14@gmail.com", "$Ola76lekan59", "alpha"),  # Done
+        ("adigunmiracle14@gmail.com", "$Ola76lekan59", "alpha"),  # ..
         # ...
-        # ("lucasria.code@gmail.com", "$Ola76lekan59", "alpha"),  # Done
-        # ("olayioyetifebright@gmail.com", "$Ola76lekan59", "alpha"),  # Done
-        # ("undertestmiracle14@gmail.com", "$Ola76lekan59", "alpha"),  # Done
-        # ("noreplyhealthcarology@gmail.com", "$Ola76lekan59", "alpha"),  # Done
-        # ("ajokemotunrayo831@gmail.com", "$Ola76lekan59", "alpha"),  # Done
-        # ("anabellac671@gmail.com", "$Ola76lekan59", "alpha"),  # Done
-        # ("dev.butterfly202@gmail.com", "$Ola76lekan59", "alpha"),  # Done
         #
         #
         # post intervention session
-        # ("adigunmiracle41@gmail.com", "$Ola76lekan59", "alpha"),  # 12/09
         # ("graychristian423@gmail.com", "247695Femi", "femi"),  # 14/09
         # ("jewelsabby2@gmail.com", "2585abigael", "femi"),  # 14/09
+        # ("my.smtp000@gmail.com", "$Ola76lekan59", "alpha"),  # 14/09
+        # ("Judeander807@gmail.com", "247695Femi", "Femi"),  # 14/09
+        # ("adigunmiracle41@gmail.com", "$Ola76lekan59", "alpha"),  # 15/09
+        # ("Deborahkate44@gmail.com", "2585abigael", "femi"),  # 20/09
         # Post intervention done (wait list for 1 months)
         # ("alphasoft2021@gmail.com", "$Ola76lekan59", "alpha"), # 09/10
         # ("micheallukas08@gmail.com", "247695Femi", "femi"), # 09/10
