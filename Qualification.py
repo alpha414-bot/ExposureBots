@@ -723,10 +723,9 @@ def run_in_batches(emails_and_passwords: List[Tuple[str, str, str]]):
 
     # Loop through accounts in batches of `max_simultaneous`
     for i in range(0, total_accounts, max_simultaneous):
+        batch_index = i // max_simultaneous + 1
         batch = emails_and_passwords[i : i + max_simultaneous]
-        logging.info(
-            f"Running batch {i // max_simultaneous + 1} with {len(batch)} accounts"
-        )
+        logging.info(f"Running batch {batch_index} with {len(batch)} accounts")
 
         with ThreadPoolExecutor(max_workers=max_simultaneous) as executor:
             futures = [
@@ -741,7 +740,16 @@ def run_in_batches(emails_and_passwords: List[Tuple[str, str, str]]):
                 except Exception as exc:
                     logging.error(f"An error occurred: {exc} {traceback.format_exc()}")
 
-        logging.info(f"Batch {i // max_simultaneous + 1} finished")
+        logging.info(f"Batch {batch_index} finished")
+        os.system(
+            'powershell -command "Add-Type -AssemblyName System.Windows.Forms; '
+            f"[System.Windows.Forms.MessageBox]::Show('Batch {batch_index} is fully completed and done.')\""
+        )
+
+    os.system(
+        'powershell -command "Add-Type -AssemblyName System.Windows.Forms; '
+        "[System.Windows.Forms.MessageBox]::Show('ALL PROCESSES ARE DONE. PLEASE CLOSE OR STOP TERMINAL NOW')\""
+    )
 
 
 def run_single_account(email: str, password: str, person: str):
@@ -759,5 +767,6 @@ def run_single_account(email: str, password: str, person: str):
 if __name__ == "__main__":
     accounts = [
         # Add more accounts as needed
+        ("", "$Ola76lekan59", "alpha")
     ]
     run_in_batches(accounts)

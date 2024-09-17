@@ -21,16 +21,16 @@ logging.basicConfig(
 )
 logging.getLogger("httpx").setLevel(logging.WARNING)
 
-MAX_LIMIT = 5
+MAX_LIMIT = 12
 
 
-class Video:
+class Check:
     def __init__(self, email, password, person) -> None:
         self.email = email
         self.password = password
         self.person = person
         self.driver = webdriver.Chrome(options=self.chrome_options())
-        self.wait = WebDriverWait(self.driver, timeout=10)
+        self.wait = WebDriverWait(self.driver, timeout=6)
         self.running = True
         self.vars = {}
 
@@ -46,14 +46,15 @@ class Video:
             logging.error(traceback.format_exc())
             raise
 
-    def teardown_method(self):
+    def teardown_method(self, message="Message is here"):
         """Teardown method to quit the WebDriver and show a message box."""
         logging.info(f"Finished process for {self.email}")
         logging.warning("Driver is quitting")
+        self.running = False
         self.driver.quit()
         os.system(
             'powershell -command "Add-Type -AssemblyName System.Windows.Forms; '
-            f"[System.Windows.Forms.MessageBox]::Show('Your research for [{self.email}] is done.')\""
+            f"[System.Windows.Forms.MessageBox]::Show('{message}')\""
         )
 
     def chrome_options(self):
@@ -72,12 +73,8 @@ class Video:
         chrome_options.add_argument("--use-fake-device-for-media-stream")
         chrome_options.add_argument("--auto-accept-camera-and-microphone-capture")
         chrome_options.add_argument("--disable-infobars")
-        user_data_dir = r"C:\Users\owner\AppData\Local\Google\Chrome\User Data"
-        profile_directory = (
-            r"C:\Users\owner\AppData\Local\Google\Chrome\User Data\Profile 2"
-        )
-        # chrome_options.add_argument(f"--user-data-dir={user_data_dir}")
-        # chrome_options.add_argument(f"--profile-directory={profile_directory}")
+        chrome_options.add_argument("--disable-infobars")
+        chrome_options.add_argument("--headless")  # Optional: run in headless mode
         # User Agent
         chrome_options.add_argument(
             "--user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36"
@@ -88,16 +85,7 @@ class Video:
         )
         return chrome_options
 
-    def _check_section(self, locator: str):
-        """Checks if a section is present by the specified locator."""
-        try:
-            return self.wait.until(
-                EC.presence_of_element_located((By.CSS_SELECTOR, locator))
-            )
-        except:
-            return False
-
-    def _visible_section(self, locator: str, timeout: float = 4):
+    def _visible_section(self, locator: str, timeout: float = 3):
         """Checks if a section is visible by the specified locator."""
         try:
             custom_wait = WebDriverWait(self.driver, timeout=timeout)
@@ -156,142 +144,38 @@ class Video:
                 logging.info("<<< Question Section Thread >>>")
                 while self.running:
                     try:
-                        if self._visible_section("#Questions"):
+                        self.driver.execute_script(
+                            f"document.title = '[{self.email}] Check Exposure ';"
+                        )
+                        if not self._visible_section("#Questions"):
+                            self.teardown_method(
+                                message=f"AVAILABLE: Research for [{self.email}] is available."
+                            )
+                            self.driver.quit()
+                        else:
                             Text = self.driver.find_element(By.ID, "Questions").text
-                            if "You can download the handout" in Text:
-                                if self._check_section("#NextButton"):
-                                    self._click_button()
-                            if "you will be asked to watch" in Text:
-                                if self._check_section("#NextButton"):
-                                    self._click_button()
-                            # Add a condition to break out of the loop when the task is done
                             if (
                                 ("You have completed" in Text)
                                 or ("It has been less than" in Text)
                                 or ("It appears there may be an error" in Text)
                                 or ("your session has expired" in Text)
                             ):
-                                logging.info("Done ... Text")
-                                self.running = False  # stop runing the loop, video is done completely
-                                self._click_button()
+                                # This email research is done
+                                self.teardown_method(
+                                    f"DONE: [{self.email}] research is done already."
+                                )
+                                self.driver.quit()
                                 break
-                    except:
-                        continue
-
-            def I_Gorilla():
-                logging.info("<<< Gorilla Section Thread >>>")
-                while self.running:
-                    try:
-                        if self._visible_section("#gorilla", timeout=0.2):
-                            parent_elements = self.wait.until(
-                                EC.visibility_of_any_elements_located(
-                                    (By.CSS_SELECTOR, "#gorilla div.lookahead-frame")
+                            else:
+                                self.teardown_method(
+                                    message=f"AVAILABLE: Research for [{self.email}] is available."
                                 )
-                            )
-                            for look_element in parent_elements:
-                                if look_element.is_displayed():
-                                    try:
-                                        continue_button = look_element.find_element(
-                                            By.ID, "continue-button"
-                                        )
-                                        continue_button.click()
-                                    except:
-                                        continue
+                                self.driver.quit()
+
                     except:
                         continue
 
-            def I_SliderRange():
-                logging.info("<<< slider range Thread >>>")
-                while self.running:
-                    try:
-                        parent = self._visible_section(".gorilla-content-slider.slider")
-                        if parent:
-                            print("Found a slider parent")
-                            parent_element = parent.find_element(
-                                By.CSS_SELECTOR, ".slider-track"
-                            )
-                            if parent_element:
-                                print("Found a slider track")
-                                slider_thumb = parent_element.find_element(
-                                    By.CSS_SELECTOR, ".slider-handle"
-                                )
-                                if slider_thumb:
-                                    print("Find a slider thumb")
-                                    random_range_value = random.choice(
-                                        range(35, 90)
-                                    )  # The value you want to set
-                                    random_range_value = random_range_value - 10
-                                    offset = int(
-                                        (random_range_value / 100)
-                                        * parent_element.size["width"]
-                                    )
-                                    actions = ActionChains(self.driver)
-                                    actions.click_and_hold(slider_thumb).move_by_offset(
-                                        offset, 0
-                                    ).release().perform()
-                                    print(
-                                        f"Slided me {offset}, percentage: {random_range_value}% "
-                                    )
-                                    self._click_button((By.ID, "continue-button"))
-                        elif self._visible_section("#continue-button", timeout=0.2):
-                            self._click_button((By.ID, "continue-button"))
-                    except:
-                        continue
-
-            def I_ButtonSetup(id_locator):
-                logging.info(f"<<< running button thread: {id_locator} >>>")
-                while self.running:
-                    self.driver.execute_script(
-                        f"document.title = '[{self.email}] Video Exposure ';"
-                    )
-                    self.driver.execute_script(
-                        f"""
-                        document.title = '[{self.email}] Qualification Exposure';
-                        console.log(JSON.stringify({{
-                            'email': '{self.email}'
-                        }}));
-                        """
-                    )
-                    try:
-                        if not self._visible_section(
-                            "#Questions", timeout=0.2
-                        ) or not self._visible_section("#gorilla", timeout=0.2):
-                            if self._visible_section(f"#{id_locator}", timeout=0.2):
-                                self._click_button((By.ID, f"{id_locator}"))
-                    except:
-                        continue
-
-            I_QuestionThread = threading.Thread(target=I_Question)
-            I_GorillaThread = threading.Thread(target=I_Gorilla)
-            I_SliderRangeThread = threading.Thread(target=I_SliderRange)
-            NextButtonThread = threading.Thread(
-                target=I_ButtonSetup, args=("NextButton",)
-            )
-            ContinueButtonThread = threading.Thread(
-                target=I_ButtonSetup, args=("continue-button",)
-            )
-            StartButtonThread = threading.Thread(
-                target=I_ButtonSetup, args=("start-button",)
-            )
-            MediaAccessButtonThread = threading.Thread(
-                target=I_ButtonSetup, args=("media-access-check",)
-            )
-            logging.info("... starting thread ...")
-            I_QuestionThread.start()
-            I_GorillaThread.start()
-            I_SliderRangeThread.start()
-            NextButtonThread.start()
-            ContinueButtonThread.start()
-            StartButtonThread.start()
-            MediaAccessButtonThread.start()
-            logging.info("... joining thread ...")
-            I_QuestionThread.join()
-            I_GorillaThread.join()
-            I_SliderRangeThread.join()
-            NextButtonThread.join()
-            ContinueButtonThread.join()
-            StartButtonThread.join()
-            MediaAccessButtonThread.join()
+            I_Question()
         except:
             print(f"Traceback is ${traceback.format_exc()}")
 
@@ -309,9 +193,10 @@ def run_in_batches(emails_and_passwords: List[Tuple[str, str, str]]):
 
     # Loop through accounts in batches of `max_simultaneous`
     for i in range(0, total_accounts, max_simultaneous):
-        batch_index = i // max_simultaneous + 1
         batch = emails_and_passwords[i : i + max_simultaneous]
-        logging.info(f"Running batch {batch_index} with {len(batch)} accounts")
+        logging.info(
+            f"Running batch {i // max_simultaneous + 1} with {len(batch)} accounts"
+        )
 
         with ThreadPoolExecutor(max_workers=max_simultaneous) as executor:
             futures = [
@@ -326,11 +211,7 @@ def run_in_batches(emails_and_passwords: List[Tuple[str, str, str]]):
                 except Exception as exc:
                     logging.error(f"An error occurred: {exc} {traceback.format_exc()}")
 
-        logging.info(f"Batch {batch_index} finished")
-        os.system(
-            'powershell -command "Add-Type -AssemblyName System.Windows.Forms; '
-            f"[System.Windows.Forms.MessageBox]::Show('Batch {batch_index} is fully completed and done.')\""
-        )
+        logging.info(f"Batch {i // max_simultaneous + 1} finished")
 
     os.system(
         'powershell -command "Add-Type -AssemblyName System.Windows.Forms; '
@@ -340,11 +221,10 @@ def run_in_batches(emails_and_passwords: List[Tuple[str, str, str]]):
 
 def run_single_account(email: str, password: str, person: str):
     logging.info(f"Starting process for {email}")
-    test = Video(email=email, password=password, person=person)
+    test = Check(email=email, password=password, person=person)
     try:
         test.start()
     finally:
-        test.teardown_method()
         logging.info(f"Finished process for {email}")
         time.sleep(10)  # Introduce a delay to minimize CPU and network strain
 
